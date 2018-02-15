@@ -15,7 +15,7 @@ const int CAR_GREEN = 10;
 const int PED_RED = 9; // assign the pedestrian lights
 const int PED_GREEN = 8;
 const int BUTTON = 2; // button pin
-int crossTime = 10000; // time alloyoud to cross
+unsigned long crossTime = 10000; // time alloyoud to cross
 unsigned long changeTime; // time since BUTTON pressed
 int state = LOW; //If is push buttom
 
@@ -29,6 +29,7 @@ void setup() {
   // turn on the green light
   digitalWrite(CAR_GREEN, HIGH);
   digitalWrite(PED_RED, HIGH);
+  Serial.begin(9600);
 }
 
 void loop() {
@@ -36,6 +37,10 @@ void loop() {
     state = HIGH;
   /* check if BUTTON is pressed and it is over 5 seconds since last button press */
   if (state == HIGH && (millis() - changeTime) > crossTime) {
+    int valor= analogRead(A0);
+    crossTime = map(valor, 0, 1023, 10, 60)*1000; //Calcula el valor del tiempo de cruze
+    Serial.println(crossTime);
+    Serial.println(valor);
     changeLights(); // change the lights
     state = LOW; //Reset state
   }
@@ -58,12 +63,9 @@ void changeLights() {
   flash(PED_GREEN); // flash the ped green
   // turn ped red on
   digitalWrite(PED_RED, HIGH);
-  delay(500);
-  digitalWrite(CAR_YELLOW, HIGH); // yellow on
-  digitalWrite(CAR_RED, LOW); // red off
   delay(1000);
+  digitalWrite(CAR_RED, LOW); // red off
   digitalWrite(CAR_GREEN, HIGH);
-  digitalWrite(CAR_YELLOW, LOW); // yellow off
 
   // record the time since last change of lights
   changeTime = millis();
